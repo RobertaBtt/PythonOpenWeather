@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 
-__author__ = 'roby'
+__author__ = 'RobertaBtt'
 
 import sys, getopt
-import urllib2
-import requests
+
+import urllib.request
 import datetime
 from collections import Counter
+import json
 
+# url = "http://www.google.com/"
+# request = urllib.request.Request(url)
+# response = urllib.request.urlopen(request)
+# print (response.read().decode('utf-8'))
 
 
 class Forecast:
@@ -18,20 +23,20 @@ class Forecast:
         try:
             opts, args = getopt.getopt(argv,"hn:c:",["ndays=","cityname="])
         except getopt.GetoptError:
-            print 'Usage: forecast.py -n <number of days> -c <city name>'
+            print("Usage: forecast.py -n <number of days> -c <city name>")
             sys.exit(2)
         for opt, arg in opts:
             if opt == '-h':
-                print 'Usage: forecast.py -n <number of days> -c <city name>'
+                print("Usage: forecast.py -n <number of days> -c <city name>")
                 sys.exit()
             elif opt in ("-n", "--ndays"):
                 number_of_days = arg
             elif opt in ("-c", "--cityname"):
                 city_name = arg
         try:
-            print self.__manage_request(number_of_days, city_name)
-        except urllib2.HTTPError, e:
-            print e
+            print(self.__manage_request(number_of_days, city_name))
+        except urllib.error.HTTPError as e:
+            print (e)
 
 
     def __manage_request(self, ndays, cityname):
@@ -42,15 +47,20 @@ class Forecast:
         weather_conditions = []
         raining_days = []
 
-        r = requests.get("http://api.openweathermap.org/data/2.5/forecast/"
-                "daily?q="+cityname+"&units=metric&cnt="+str(ndays)+"&APPID=0e83edfb1541cb66a71db49f12ac7e98")
+        url = "http://api.openweathermap.org/data/2.5/forecast/" \
+              "daily?q="+cityname+"&units=metric&cnt="+str(ndays)+"&APPID=0e83edfb1541cb66a71db49f12ac7e98"
 
-        if r.status_code != 200:
-            print "Please check city name or number of forecast days"
+        request = urllib.request.Request(url)
+        response = urllib.request.urlopen(request)
+
+        if response.status != 200:
+            print("Please check city name or number of forecast days")
             return {}
 
-        jsonText = r.json()
-        forecast_list = jsonText['list']
+        string = response.read().decode('utf-8')
+        json_obj = json.loads(string)
+
+        forecast_list = json_obj['list']
         for f in forecast_list:
             list_max_temperature.append(f['temp']['max'])
             list_min_temperature.append(f['temp']['min'])
