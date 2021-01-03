@@ -1,22 +1,14 @@
-# -*- coding: utf-8 -*-
-
 __author__ = 'RobertaBtt'
 
 import sys, getopt
-
 import urllib.request
 import datetime
 from collections import Counter
 import json
 
-# url = "http://www.google.com/"
-# request = urllib.request.Request(url)
-# response = urllib.request.urlopen(request)
-# print (response.read().decode('utf-8'))
-
-
 class Forecast:
-    def main(self, argv):
+    @staticmethod
+    def getForecastByCityAndDays(argv):
         number_of_days = ''
         city_name = ''
 
@@ -34,13 +26,13 @@ class Forecast:
             elif opt in ("-c", "--cityname"):
                 city_name = arg
         try:
-            print(self.__manage_request(number_of_days, city_name))
+            return (Forecast.__manage_request(number_of_days, city_name))
         except urllib.error.HTTPError as e:
             print (e)
 
+    @staticmethod
+    def __manage_request(ndays, cityname):
 
-    def __manage_request(self, ndays, cityname):
-        result = {}
         list_min_temperature = []
         list_max_temperature = []
 
@@ -49,7 +41,8 @@ class Forecast:
 
         url = "http://api.openweathermap.org/data/2.5/forecast/" \
               "daily?q="+cityname+"&units=metric&cnt="+str(ndays)+"&APPID=0e83edfb1541cb66a71db49f12ac7e98"
-
+        #url = "http://api.openweathermap.org/data/2.5/forecast/daily?q=Barcelona&units=metric&cnt=10&APPID=0e83edfb1541cb66a71db49f12ac7e98"
+        #print("URL", url)
         request = urllib.request.Request(url)
         response = urllib.request.urlopen(request)
 
@@ -82,4 +75,4 @@ class Forecast:
 
 if __name__ == "__main__":
     forecast = Forecast()
-    forecast.main(sys.argv[1:])
+    print(forecast.getForecastByCityAndDays(sys.argv[1:]))
